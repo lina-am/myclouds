@@ -14,7 +14,7 @@ class CloudPhoto
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private string $description = null;
+    private string $description = '';
 
     #[ORM\ManyToOne(inversedBy: 'cloudPhotos')]
     #[ORM\JoinColumn(nullable: false)]
