@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}CloudBox {{ box.id }}{% endblock %}
+
+{% block body %}
+<h1>CloudBox n°{{ box.id }}</h1>
+
+<table class="table">
+  <tbody>
+    <tr>
+      <th>Id</th>
+      <td>{{ box.id }}</td>
+    </tr>
+    <tr>
+      <th>Description</th>
+      <td>{{ box.description }}</td>
+    </tr>
+
+    <tr>
+      <th>Photos</th>
+      <td>
+        {% if box.cloudPhotos is not empty %}
+          <ul>
+            {% for p in box.cloudPhotos %}
+              <li>
+                <a href="{{ path('photo_show', {'id': p.id}) }}">
+                  {{ p }}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <em>(aucune photo dans cette CloudBox)</em>
+        {% endif %}
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p><a href="{{ path('cloudbox_list') }}">← Retour à la liste</a></p>
+{% endblock %}
