@@ -1,4 +1,4 @@
-# 🌥️ MyClouds – Projet CSC4101
+# 🌥️ MyClouds : Projet CSC4101 , Lina Amelal
 
 ## Objectif du projet
 **MyClouds** est une application web développée dans le cadre du module CSC4101.  
