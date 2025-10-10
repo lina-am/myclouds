@@ -24,6 +24,9 @@ class CloudBox
     #[ORM\OneToMany(targetEntity: CloudPhoto::class, mappedBy: 'box')]
     private Collection $cloudPhotos;
 
+    #[ORM\OneToOne(mappedBy: 'cloudBox', cascade: ['persist', 'remove'])]
+    private ?Member $member = null;
+
     public function __construct()
     {
         $this->cloudPhotos = new ArrayCollection();
@@ -79,5 +82,27 @@ class CloudBox
     public function __toString(): string
     {
         return $this->description ?: 'CloudBox #'.$this->id;
+    }
+
+    public function getMember(): ?Member
+    {
+        return $this->member;
+    }
+
+    public function setMember(?Member $member): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($member === null && $this->member !== null) {
+            $this->member->setCloudBox(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($member !== null && $member->getCloudBox() !== $this) {
+            $member->setCloudBox($this);
+        }
+
+        $this->member = $member;
+
+        return $this;
     }
 }
