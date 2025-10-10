@@ -9,7 +9,7 @@
   {% for box in boxes %}
     <li>
       <a href="{{ path('cloudbox_show', {'id': box.id}) }}">
-        CloudBox {{ box.id }} — {{ box.description }}
+        CloudBox {{ box.id }} - {{ box.description }}
       </a>
     </li>
   {% else %}

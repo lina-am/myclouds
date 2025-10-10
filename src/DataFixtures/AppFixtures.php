@@ -4,6 +4,7 @@ namespace App\DataFixtures;
 
 use App\Entity\CloudBox;
 use App\Entity\CloudPhoto;
+use App\Entity\Gallery;
 use App\Entity\Member;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -11,42 +12,46 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
-    private UserPasswordHasherInterface $hasher;
-
-    public function __construct(UserPasswordHasherInterface $hasher)
-    {
-        $this->hasher = $hasher;
-    }
-
-    /** @return \Generator<array{0:string,1:string,2:string}> */
-    private function membersGenerator(): \Generator
-    {
-        yield ['olivier@localhost', '123456', 'Olivier'];
-        yield ['slash@localhost',   '123456', 'Slash'];
-    }
+    public function __construct(private UserPasswordHasherInterface $hasher) {}
 
     public function load(ObjectManager $manager): void
     {
-        // Données démo CloudBox / CloudPhoto (déjà présentes dans ton projet)
+        // --- CloudBoxes (Inventaires)
         $boxA = (new CloudBox())->setDescription('Boîte A : Nuages stratifiés');
         $boxB = (new CloudBox())->setDescription('Boîte B : Cumulus');
         $manager->persist($boxA);
         $manager->persist($boxB);
 
-        $manager->persist((new CloudPhoto())->setDescription('Cumulus au coucher du soleil')->setBox($boxB));
-        $manager->persist((new CloudPhoto())->setDescription('Stratus bas sur Paris')->setBox($boxA));
+        // --- Photos
+        $p1 = (new CloudPhoto())->setDescription('Stratus bas sur Paris')->setBox($boxA);
+        $p2 = (new CloudPhoto())->setDescription('Cumulus au coucher du soleil')->setBox($boxB);
+        $p3 = (new CloudPhoto())->setDescription('Altocumulus au dessus du lac')->setBox($boxB);
+        $manager->persist($p1);
+        $manager->persist($p2);
+        $manager->persist($p3);
 
-        // Membres
-        foreach ($this->membersGenerator() as [$email, $plainPassword, $nom]) {
-            $user = new Member();
-            $user->setEmail($email);
-            $user->setNom($nom); // requis car not null
+        // Un créateur (Member)
+        $m = new Member();
+        $m->setEmail('demo@localhost');
+        $m->setPassword($this->hasher->hashPassword($m, '123456'));
+        $m->setNom('Démo');
+        $manager->persist($m);
 
-            $hashed = $this->hasher->hashPassword($user, $plainPassword);
-            $user->setPassword($hashed);
+        // Galleries
+        $g1 = (new Gallery())
+            ->setDescription('Galerie Stratiforme')
+            ->setPublished(true)
+            ->setCreator($m);
+        $g1->addPhoto($p1)->addPhoto($p2);   // ⟵ ajoute 2 photos
 
-            $manager->persist($user);
-        }
+        $g2 = (new Gallery())
+            ->setDescription('Galerie Cumulus')
+            ->setPublished(false)
+            ->setCreator($m);
+        $g2->addPhoto($p2)->addPhoto($p3);   // ⟵ recoupe sur p2
+
+        $manager->persist($g1);
+        $manager->persist($g2);
 
         $manager->flush();
     }
