@@ -1,0 +1,7 @@
+bootstrap_menu:
+  menus:
+    main:
+      items:
+        cloudboxes:
+          label: 'CloudBoxes'
+          route: 'cloudbox_list'
